@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_admin import Admin
 
 app = Flask(__name__)
 
@@ -13,7 +13,12 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///biblioteca.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
-
-# Importar rutas
-from biblioteca import routes
 from biblioteca import models
+
+# Configuración del módulo ADMIN
+admin = Admin(app)
+admin.add_view(models.BookView(models.Book, db.session))
+admin.add_view(models.AuthorView(models.Author, db.session))
+
+# Importar rutas y modelos
+from biblioteca import routes

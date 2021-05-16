@@ -1,5 +1,11 @@
 from datetime import date
+
+from flask import Markup
+from sqlalchemy import func
+from flask_admin.contrib.sqla import ModelView
+
 from biblioteca import db
+
 
 class Book(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
@@ -26,7 +32,13 @@ class Author(db.Model):
     name = db.Column(db.String(255), nullable=False)
     books_written = db.relationship("Book", back_populates="author")
     
-
+    def __repr__(self):
+        return f"<Author: {self.name}>"
+    
+    @property
+    def amount_books_written(self):
+        return len(self.books_written)
+        
 class Loan(db.Model):
     _id = db.Column("id", db.Integer, primary_key=True)
     loaner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -46,6 +58,20 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     loans = db.relationship("Loan", back_populates="loaner")
     
+    @property
+    def current_loans(self):
+        curr_loans = [loan for loan in self.loans if loan.returned]
+    
+    
+class BookView(ModelView):
+    column_exclude_list = ["online_picture_route", "local_picture_route"]
+    column_searchable_list = ['title', 'isbn']
+    column_filters = ['author']
+    page_size = 30
 
+
+class AuthorView(ModelView):
+    
+    column_list = ("name", "amount_books_written")
     
     
