@@ -41,7 +41,7 @@
         <div class="masthead2-content">
             <div class="container">
                 <h1 class="masthead2-heading">BiblioTech - Búsqueda</h1>
-                <h2 class="masthead2-subheading mb-0">Busca aquí el libro que deseas leer o prestar</h2>
+                <h2 class="masthead2-subheading mb-0">Busqueda {{ search_params }}</h2>
             </div>
         </div>
     </header>
@@ -50,12 +50,13 @@
             <div class="container mt-5">
                 <div class="row align-items-center row-cols-1 row-cols-md-3 g-4 mb-3">
                     {% for book in books.items %}
-                        <div class="col mb-3">
+                        <div class="col mb-4">
                             <div class="card text-white bg-dark h-100" style="width: 18rem;">
-                                <img class="card-img-top" src="{{ book.online_picture_route }}">
+                                <img class="card-img-top" src="{{ book.online_picture_route }}" width="150" height="400">
                                 <div class="card-body">
                                 <h5 class="card-title">{{ book.title }}</h5>
                                 <p class="card-text">Por: {{ book.author.name }}</p>
+                                <p class="card-text">ISBN: {{ book.isbn }}</p>
                                 <a href="#" class="btn btn-primary">
                                     <i class="far fa-heart"></i>
                                 </a>
@@ -67,6 +68,13 @@
                         </div>
                     {% endfor %}
                 </div>
+            </div>
+        {% else %}
+            <div class="container mt-5">
+                <div class="row align-items-center">
+                    <h1 class="text-center">No se ha encontrado ningún libro con los parámetros dados, Intente nuevamente</h1>
+                </div>
+
             </div>
         {% endif %}
             

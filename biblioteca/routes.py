@@ -27,19 +27,34 @@ def search():
         if request.form["simple_search"] == "":
             return redirect(url_for('home'))
         else:
-            return redirect(url_for('results', name=request.form["simple_search"]))
+            return redirect(url_for('results', title=request.form["simple_search"]))
+    else:
+        
+        return redirect(url_for('results', title=request.form["title"], author=request.form["author"], isbn=request.form["isbn"]))
         
 
 @app.route("/results")
 def results():
     page = request.args.get('page', 1, type=int)
-    
+    params = ""
     books = db.session.query(Book)
-    if "name" in request.args:
-        print("Búsqueda por nombre")
+    if not request.args.get("title", "") == "":
+        books = books.filter(Book.title.like(f"%{request.args['title']}%"))
+        params += f"- Nombre: {request.args['title']} "
     
-    books = books.paginate(page=page, per_page=12)
-    return render_template("results.html", books=books)
+    if not request.args.get("author", "") == "":
+        books = books.join(Author).filter(Author.name.like(f"%{request.args['author']}%"))
+        params += f"- Autor: {request.args['author']} "
+    
+    if not request.args.get("isbn", "") == "":
+        books = books.filter(Book.isbn == request.args["isbn"])
+        params += f"- ISBN: {request.args['author']} "
+    
+    if len(books.all()) == 0:
+        books = None
+    else:
+        books = books.paginate(page=page, per_page=12)
+    return render_template("results.html", books=books, search_params=params)
 
 @app.route("/login")
 def login():
